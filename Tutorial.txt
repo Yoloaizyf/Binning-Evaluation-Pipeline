@@ -1,0 +1,29 @@
+Environment requirements
+This program has only been tested in the Linux environment and cannot be guaranteed to run on other systems. Some of the tools required by the pipeline have been downloaded and saved in the corresponding folder. To successfully run through the pipeline, the following software is still required:
+1.All software for simulating pipelines mentioned in the CAMISIM manual, including: python >=3, Biopython, BIOM format, NumPy, Matplotlib, Perl 5 and the library XML::Simple, wgsim, NanoSim, PBsim.
+2.Bowtie2, SAMtools, CoverM for mapping and coverage calculating.
+3.MetaBAT2 and CONCOCT binning tool.
+
+Usage
+The process for using this program to evaluate new binning tools in development is divided into three steps: 1. dataset simulation and coverage calculation; 2. use simulated data on the new binning tool to generate bins; 3. select from the three provided existing binning softwares to compare with and run the assessment procedure. 
+
+This program can be downloaded from the github repository (https) provided in the availability section. 
+
+1.In the first step, to generate the metagenome dataset and calculate the coverage, use the following command: 
+
+Profile-based mode:
+python data_simulation.py -p path/to/taxonomic_profile.biom -m True
+
+De novo mode: 
+python data_simulation.py -c path/to/config_file.ini -m True
+
+taxonomic_profile.biom is the BIOM format file storing the microbial community genome abundance distribution. config_file.ini is the configuration file, which contains multiple settings that can be changed on demand. If mapping needs to be proceeded and coverage needs to be calculated, then the parameter -m needs to be set to true. Three folders will be generated in this step: “CAMISIM_output”, “CoverM_output” and “preparation”. “CAMISIM_output” contains all the information of the simulated metagenome dataset, including gold standard assembly, sample information, and distribution files. “CoverM_output” contains a table of coverage values, in which the mean coverage is stored in the first row. The “preparation” folder contains the alignment file and the decompressed gold standard, as well as the read files.
+
+
+2.In the second step, the user has to pass the metagenomic dataset information generated in the first step to their binning tool on demand and generate the results. It is important to note that the file format should be Bioboxes binning format if the results are going to participate in the third step of the evaluation.
+
+3.The third step combines the selection of existing binned methods and the AMBER assessment. To choose the tools to compare with and go through the evaluation, use the following command:
+
+python evaluation.py -b metabat2 maxbin2 concoct -c path/to/new/tool/result.binning
+
+The number of selected tools can be one to three as needed. The result.binning file is the result of the new binning tool that will be compared by AMBER. It is also possible to not add any results from new binning tools, and that will generate the comparison of selected tools and the gold standard. For each existing binning method that is chosen, an output folder will be generated for further comparing. A folder named “Amber_output” contains the final assessment report in an interactive HTML page and charts.
